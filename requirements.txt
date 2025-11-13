@@ -6,3 +6,4 @@ wordcloud
 Mastodon.py
 beautifulsoup4
 numpy
+plotly
