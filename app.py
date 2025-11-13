@@ -58,7 +58,6 @@ wordcloud = WordCloud(
     width=800,
     height=400,
     background_color='white',
-    font_path=font_path
 ).generate_from_frequencies(hashtag_freq)
 
 plt.figure(figsize=(12,6))
