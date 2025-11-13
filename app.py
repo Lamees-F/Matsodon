@@ -69,7 +69,7 @@ wordcloud = WordCloud(
     height=450,
     background_color='white',
     colormap='Blues',
-    font_path="C:/Windows/Fonts/msgothic.ttc"  # Japanese-capable font
+    #font_path="C:/Windows/Fonts/msgothic.ttc"  # Japanese-capable font
 ).generate_from_frequencies(hashtag_freq)
 
 plt.figure(figsize=(12,6))
@@ -134,4 +134,94 @@ fig_day = px.bar(
     labels={'day':'Day of Week', 'count':'Number of Posts'}
 )
 st.plotly_chart(fig_day, use_container_width=True)
+# ==========================================================
+# 🧭 User Insights (Interactive Plotly Visualizations)
+# ==========================================================
+st.header("User Insights (Interactive Plotly Visualizations)")
+st.markdown("""
+Explore user-level patterns derived from Mastodon activity data.  
+These interactive charts offer deeper insight into user behavior, engagement, and influence.
+""")
+
+try:
+    # ------------------------------
+    # Load user data from Google Drive
+    # ------------------------------
+    orig_url = 'https://drive.google.com/file/d/1QsnE86MUndd8NpQWu1UVtnJSXcWg-Vqd/view?usp=sharing'
+    file_id = orig_url.split('/')[-2]
+    dwn_url = 'https://drive.google.com/uc?export=download&id=' + file_id
+
+    user_df = pd.read_csv(
+        dwn_url,
+        sep=None,
+        engine='python',
+        on_bad_lines='skip'
+    )
+
+    # ------------------------------
+    # Scatter: Followers vs Following
+    # ------------------------------
+    st.subheader("Followers vs Following 🧑‍🤝‍🧑")
+    fig = px.scatter(
+        user_df,
+        x="following_count",
+        y="followers_count",
+        hover_name="username",
+        color="user_type",
+        size="statuses_count",
+        log_x=True,
+        log_y=True,
+        range_x=[1, 10_000_000],
+        range_y=[1, 10_000_000]
+    )
+    fig.update_traces(marker=dict(opacity=0.6, size=8))
+    fig.update_layout(template="plotly_white")
+    st.plotly_chart(fig, use_container_width=True)
+
+    # ------------------------------
+    # Scatter: Followers vs Account Age
+    # ------------------------------
+    st.subheader("Followers vs Account Age ⏳")
+    fig = px.scatter(
+        user_df,
+        x="account_age_days",
+        y="followers_count",
+        color="user_type",
+        hover_name="username",
+        log_x=True,
+        log_y=True,
+        title="Followers vs Account Age (interactive log–log)",
+        labels={"account_age_days": "Account Age (days)", "followers_count": "Followers"}
+    )
+    fig.update_traces(marker=dict(opacity=0.6, size=8))
+    fig.update_layout(template="plotly_white")
+    st.plotly_chart(fig, use_container_width=True)
+
+  
+        # ------------------------------
+        # Boxplot: Follower Count by Top Tags
+        # ------------------------------
+    tags_df = user_df[['username', 'followers_count', 'featured_tags']].dropna(subset=['featured_tags']).copy()
+    tags_df = tags_df.assign(featured_tags=tags_df['featured_tags'].str.split(',')).explode('featured_tags')
+    tags_df['featured_tags'] = tags_df['featured_tags'].str.strip().str.lower()
+
+    top_tags = tags_df['featured_tags'].value_counts().head(15).index
+    filtered_tags_df = tags_df[tags_df['featured_tags'].isin(top_tags)]
+
+    st.subheader("Follower Count Distribution by Top 15 Featured Tags 📊")
+    fig = px.box(
+            filtered_tags_df,
+            x="featured_tags",
+            y="followers_count",
+            log_y=True,
+            points="all",
+            title="Follower Count Distribution by Top 15 Featured Tags",
+            labels={"featured_tags": "Featured Tag", "followers_count": "Followers (log scale)"},
+        )
+    fig.update_traces(marker=dict(opacity=0.5, size=5))
+    fig.update_layout(template="plotly_white")
+    st.plotly_chart(fig, use_container_width=True)
+
+except Exception as e:
+    st.error(f"❌ Failed to load user dataset or generate visuals: {e}")
 
