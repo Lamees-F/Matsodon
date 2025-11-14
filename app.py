@@ -49,7 +49,7 @@ df['date'] = pd.to_datetime(df['date'])
 # Sidebar Controls
 # ------------------------------
 st.sidebar.header("Dashboard Controls")
-top_n = st.sidebar.slider("Number of top hashtags for word cloud", min_value=5, max_value=50, value=20)
+top_n = st.sidebar.slider("Number of top hashtags for word cloud", min_value=5, max_value=20, value=20)
 selected_hashtag = st.sidebar.selectbox("Select a hashtag to track over time", sorted(df['hashtag'].unique()))
 
 st.sidebar.markdown("---")
@@ -161,43 +161,64 @@ try:
     )
 
     # ------------------------------
-    # Scatter: Followers vs Following
+    # barplot: top users
     # ------------------------------
-    st.subheader("Followers vs Following 🧑‍🤝‍🧑")
-    fig = px.scatter(
-        user_df,
-        x="following_count",
-        y="followers_count",
-        hover_name="username",
-        color="user_type",
-        size="statuses_count",
-        log_x=True,
-        log_y=True,
-        range_x=[1, 10_000_000],
-        range_y=[1, 10_000_000]
+    # Keep only users with followers_count < 500,000,000
+    clean_df = user_df[user_df['followers_count'] < 500_000_000].copy()
+    top10 = clean_df.sort_values(by="followers_count", ascending=False).head(10)
+
+    st.subheader("Top 15 Matsodon Users 🧑‍🤝‍🧑")
+    fig = px.bar(
+    top10,
+    x="username",
+    y="followers_count",
+     log_y=True,
+    color="user_type",
+    hover_data=["display_name", "following_count", "statuses_count"],
+    title="Top 10 Most Followed Users (interactive)",
+    text_auto=True,
     )
-    fig.update_traces(marker=dict(opacity=0.6, size=8))
-    fig.update_layout(template="plotly_white")
+    fig.update_layout(template="plotly_white", xaxis_title="Username", yaxis_title="Followers Count")
+
     st.plotly_chart(fig, use_container_width=True)
 
     # ------------------------------
-    # Scatter: Followers vs Account Age
+    # Scatter: a prominent user's comparision
     # ------------------------------
-    st.subheader("Followers vs Account Age ⏳")
-    fig = px.scatter(
-        user_df,
-        x="account_age_days",
-        y="followers_count",
-        color="user_type",
-        hover_name="username",
-        log_x=True,
-        log_y=True,
-        title="Followers vs Account Age (interactive log–log)",
-        labels={"account_age_days": "Account Age (days)", "followers_count": "Followers"}
-    )
-    fig.update_traces(marker=dict(opacity=0.6, size=8))
-    fig.update_layout(template="plotly_white")
-    st.plotly_chart(fig, use_container_width=True)
+
+    target_handle = clean_df[clean_df['followers_count'] > 1000_000].sample(1)['username'].iloc[0]
+
+    influencer = clean_df[clean_df['username'] == target_handle]
+
+    st.subheader("Comparison of a Top User to the top 15 Users")
+    if not influencer.empty:
+    # Select top 15 real users + influencer
+        comp_df = pd.concat([
+            clean_df.sort_values('followers_count', ascending=False).head(15),
+            influencer
+        ])
+        comp_df = comp_df.drop_duplicates(subset="username", keep="last")
+
+
+        # Create a small temporary color label just for plotting
+        comp_df["color_label"] = "regular"
+        comp_df.loc[comp_df["user_type"].str.lower() == "bot", "color_label"] = "bot"
+        comp_df.loc[comp_df["username"] == target_handle, "color_label"] = "influencer"
+
+        fig = px.bar(
+            comp_df,
+            x="username",
+            y="followers_count",
+            log_y=True,
+            color="color_label",        
+            color_discrete_map={
+                "regular": "#636EFA",
+                "bot": "gray",
+                "influencer": "coral"
+            },
+            title="Followers: Top Users vs Selected Influencer"
+        )
+        st.plotly_chart(fig, use_container_width=True)
 
   
         # ------------------------------
