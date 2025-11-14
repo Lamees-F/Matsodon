@@ -20,10 +20,12 @@ st.set_page_config(
 # ------------------------------
 st.markdown(
     """
-    <div style="background-color:#6366F1; padding:20px; border-radius:10px; text-align:center">
-        <h1 style="color:white; font-family:'MS Gothic', sans-serif;">🦣 Mastodon Insights Dashboard</h1>
-        <p style="color:white; font-size:18px; font-family:'MS Gothic', sans-serif;">
-        Explore trending hashtags and posting patterns on Mastodon in real-time.
+    <div style="background-color:#6366F1; padding:25px; border-radius:10px; text-align:center">
+        <h1 style="color:white; font-family:'MS Gothic', sans-serif;">🦣 MastoScope Dashboard</h1>
+        <p style="color:white; font-size:20px; font-family:'MS Gothic', sans-serif;">
+        Discover the pulse of Mastodon like never before!  
+        Monitor trending hashtags, track user engagement, and uncover actionable insights in real-time.  
+        Turn raw social media activity into a strategic advantage for your brand.
         </p>
     </div>
     """,
@@ -69,7 +71,7 @@ wordcloud = WordCloud(
     height=450,
     background_color='white',
     colormap='Blues',
-    #font_path="C:/Windows/Fonts/msgothic.ttc"  # Japanese-capable font
+    font_path="C:/Windows/Fonts/msgothic.ttc"  # Japanese-capable font
 ).generate_from_frequencies(hashtag_freq)
 
 plt.figure(figsize=(12,6))
@@ -224,4 +226,27 @@ try:
 
 except Exception as e:
     st.error(f"❌ Failed to load user dataset or generate visuals: {e}")
+
+# ------------------------------
+# Closing Pitch Section
+# ------------------------------
+st.markdown(
+    """
+    <div style="background-color:#E0E7FF; padding:20px; border-radius:10px; margin-top:30px;">
+        <h2 style="color:#4F46E5; font-family:'MS Gothic', sans-serif;">Why Choose MastoScope?</h2>
+        <ul style="color:#1E293B; font-size:16px; font-family:'MS Gothic', sans-serif;">
+            <li>📊 Real-time insights into Mastodon trends and user behavior.</li>
+            <li>🚀 Interactive, intuitive dashboards for faster decision-making.</li>
+            <li>🔍 Identify influential users and top-performing hashtags effortlessly.</li>
+            <li>⚡ Turn social media data into actionable strategies for your brand.</li>
+        </ul>
+        <h3 style="color:#4F46E5; font-family:'MS Gothic', sans-serif;">⚠️Coming Soon:</h3>
+        <p style="color:#1E293B; font-size:16px; font-family:'MS Gothic', sans-serif;">
+        The <b>Best Time to Post</b> feature! Optimize your content timing based on peak user engagement and trending activity—so your posts reach the right audience at the right time.
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 
