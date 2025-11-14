@@ -38,10 +38,10 @@ st.markdown("---")
 df = pd.read_csv("data/mastodon_hashtags_raw.csv")
 df['date'] = pd.to_datetime(df['date'])
 
-df_post = pd.read_csv("data/mastodon_posts.csv")
-df_post['created_at'] = pd.to_datetime(df_post['created_at'], utc=True)
-df_post['hour'] = df_post['created_at'].dt.hour
-df_post['day_of_week'] = df_post['created_at'].dt.day_name()
+# df_post = pd.read_csv("data/mastodon_posts.csv")
+# df_post['created_at'] = pd.to_datetime(df_post['created_at'], utc=True)
+# df_post['hour'] = df_post['created_at'].dt.hour
+# df_post['day_of_week'] = df_post['created_at'].dt.day_name()
 
 # ------------------------------
 # Sidebar Controls
@@ -98,42 +98,42 @@ plt.clf()
 # ------------------------------
 # Posts by Hour of Day (Plotly)
 # ------------------------------
-st.subheader("🕒 Posts by Hour of the Day")
+# st.subheader("🕒 Posts by Hour of the Day")
 
-posts_per_hour = df_post.groupby('hour').size().sort_index().reset_index(name='count')
-peak_hour = posts_per_hour.loc[posts_per_hour['count'].idxmax(), 'hour']
+# posts_per_hour = df_post.groupby('hour').size().sort_index().reset_index(name='count')
+# peak_hour = posts_per_hour.loc[posts_per_hour['count'].idxmax(), 'hour']
 
-fig_hour = px.bar(
-    posts_per_hour,
-    x='hour',
-    y='count',
-    text='count',
-    color='count',
-    color_continuous_scale=['#6366F1', '#7C3AED'],
-    labels={'hour':'Hour of Day', 'count':'Number of Posts'}
-)
-st.plotly_chart(fig_hour, use_container_width=True)
+# fig_hour = px.bar(
+#     posts_per_hour,
+#     x='hour',
+#     y='count',
+#     text='count',
+#     color='count',
+#     color_continuous_scale=['#6366F1', '#7C3AED'],
+#     labels={'hour':'Hour of Day', 'count':'Number of Posts'}
+# )
+# st.plotly_chart(fig_hour, use_container_width=True)
 
-# ------------------------------
-# Posts by Day of Week (Plotly)
-# ------------------------------
-st.subheader("📅 Posts by Day of the Week ")
+# # ------------------------------
+# # Posts by Day of Week (Plotly)
+# # ------------------------------
+# st.subheader("📅 Posts by Day of the Week ")
 
-weekday_order = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
-posts_per_day = df_post['day_of_week'].value_counts().reindex(weekday_order).fillna(0).reset_index()
-posts_per_day.columns = ['day', 'count']
-peak_day = posts_per_day.loc[posts_per_day['count'].idxmax(), 'day']
+# weekday_order = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+# posts_per_day = df_post['day_of_week'].value_counts().reindex(weekday_order).fillna(0).reset_index()
+# posts_per_day.columns = ['day', 'count']
+# peak_day = posts_per_day.loc[posts_per_day['count'].idxmax(), 'day']
 
-fig_day = px.bar(
-    posts_per_day,
-    x='day',
-    y='count',
-    text='count',
-    color='count',
-    color_continuous_scale=['#6366F1', '#7C3AED'],
-    labels={'day':'Day of Week', 'count':'Number of Posts'}
-)
-st.plotly_chart(fig_day, use_container_width=True)
+# fig_day = px.bar(
+#     posts_per_day,
+#     x='day',
+#     y='count',
+#     text='count',
+#     color='count',
+#     color_continuous_scale=['#6366F1', '#7C3AED'],
+#     labels={'day':'Day of Week', 'count':'Number of Posts'}
+# )
+# st.plotly_chart(fig_day, use_container_width=True)
 # ==========================================================
 # 🧭 User Insights (Interactive Plotly Visualizations)
 # ==========================================================
